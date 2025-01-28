@@ -17,8 +17,23 @@
             <li class="breadcrumb-item active">Data anggota</li>
         </ol>
 
+        <?
+        class DashboardBase {
+            protected $totalPeminjaman = 0;
+            protected $jumlahAnggota = 0;
+            protected $jumlahPustaka = 0;
+        
+            public function getSummary() {
+                return [
+                    'totalPeminjaman' => $this->totalPeminjaman,
+                    'jumlahAnggota' => $this->jumlahAnggota,
+                    'jumlahPustaka' => $this->jumlahPustaka,
+                ];
+            }
+        }
+        ?>
+
         <?php
-            //Validasi untuk menampilkan pesan pemberitahuan saat user menambah anggota
             if (isset($_GET['add'])) {
                 if ($_GET['add']=='berhasil'){
                     echo"<div class='alert alert-success'><strong>Berhasil!</strong> data anggota telah ditambah!</div>";

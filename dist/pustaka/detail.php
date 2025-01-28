@@ -1,81 +1,78 @@
 <?php
 session_start();
-?>
-<div class="card">
-    <?php 
-        include '../../config/database.php';
-        $id_pustaka=$_POST["id_pustaka"];
-        $sql="select * from pustaka p 
-        inner join kategori_pustaka k on k.id_kategori_pustaka=p.kategori_pustaka
-        inner join penulis s on s.id_penulis=p.penulis
-        inner join penerbit t on t.id_penerbit=p.penerbit
-        where p.id_pustaka=$id_pustaka limit 1";
-        $hasil=mysqli_query($kon,$sql);
-        $data = mysqli_fetch_array($hasil);
 
-    ?>
-    <!-- Card Body -->
-    <div class="card-body">
-    <?php if ($data['stok']<=0): ?>
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="alert alert-warning">
-                Mohon maaf stok pustaka sedang kosong
-            </div>
-        </div>
-    </div>
-    <?php endif; ?>
-    <div class="row">
-        <div class="col-sm-6">
-            <img class="card-img-top" src="pustaka/gambar/<?php echo $data['gambar_pustaka'];?>" alt="Card image">
-        </div>
-        <div class="col-sm-6">
-            <table class="table">
-                <tbody>
-                    <tr>
-                        <td>Judul</td>
-                        <td width="78%">: <?php echo $data['judul_pustaka'];?></td>
-                    </tr>
-                    <tr>
-                        <td>Kategori</td>
-                        <td width="78%">: <?php echo $data['nama_kategori_pustaka'];?></td>
-                    </tr>
-                    <tr>
-                        <td>Penulis</td>
-                        <td width="78%">: <?php echo $data['nama_penulis'];?></td>
-                    </tr>
-                    <tr>
-                        <td>Penerbit</td>
-                        <td width="78%">: <?php echo $data['nama_penerbit'];?></td>
-                    </tr>
-                    <tr>
-                        <td>Tahun</td>
-                        <td width="78%">: <?php echo $data['tahun'];?></td>
-                    </tr>
-                    <tr>
-                        <td>Halaman</td>
-                        <td width="78%">: <?php echo $data['halaman'];?></td>
-                    </tr>
-                    <tr>
-                        <td>Jumlah Stok</td>
-                        <td width="78%">: <?php echo $data['stok'];?></td>
-                    </tr>
-                    <tr>
-                        <td>Posisi Rak</td>
-                        <td width="78%">: <?php echo $data['rak'];?></td>
-                    </tr>
-                    <?php if ($data['stok']>=1): ?>
-                    <tr>
-                        <td colspan="2">  
-                            <?php if ($_SESSION['level']=='Anggota' or $_SESSION['level']=='anggota'): ?>
-                            <a href="index.php?page=keranjang&kode_pustaka=<?php echo $data['kode_pustaka']; ?>&aksi=pilih_pustaka"  class="btn btn-dark btn-block"> Masukan Keranjang</a>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    </div>
+class PustakaBase {
+    protected $kon; 
+
+    public function __construct($kon) {
+        $this->kon = $kon;
+    }
+
+    protected function getPustakaById($id_pustaka) {
+        $sql = "SELECT * FROM pustaka p 
+                INNER JOIN kategori_pustaka k ON k.id_kategori_pustaka = p.kategori_pustaka
+                INNER JOIN penulis s ON s.id_penulis = p.penulis
+                INNER JOIN penerbit t ON t.id_penerbit = p.penerbit
+                WHERE p.id_pustaka = $id_pustaka LIMIT 1";
+        $hasil = mysqli_query($this->kon, $sql);
+        return mysqli_fetch_array($hasil);
+    }
+}
+
+class PustakaDetails extends PustakaBase {
+
+    public function displayDetails($id_pustaka) {
+        $data = $this->getPustakaById($id_pustaka);
+
+        if (!$data) {
+            echo "<div class='alert alert-danger'>Data pustaka tidak ditemukan.</div>";
+            return;
+        }
+
+        // Menampilkan informasi pustaka
+        echo '<div class="card-body">';
+        if ($data['stok'] <= 0) {
+            echo '<div class="alert alert-warning">Mohon maaf stok pustaka sedang kosong</div>';
+        }
+
+        echo '<div class="row">';
+        echo '<div class="col-sm-6">';
+        echo '<img class="card-img-top" src="pustaka/gambar/' . $data['gambar_pustaka'] . '" alt="Card image">';
+        echo '</div>';
+        echo '<div class="col-sm-6">';
+        echo '<table class="table">';
+        echo '<tbody>';
+        echo '<tr><td>Judul</td><td>: ' . $data['judul_pustaka'] . '</td></tr>';
+        echo '<tr><td>Kategori</td><td>: ' . $data['nama_kategori_pustaka'] . '</td></tr>';
+        echo '<tr><td>Penulis</td><td>: ' . $data['nama_penulis'] . '</td></tr>';
+        echo '<tr><td>Penerbit</td><td>: ' . $data['nama_penerbit'] . '</td></tr>';
+        echo '<tr><td>Tahun</td><td>: ' . $data['tahun'] . '</td></tr>';
+        echo '<tr><td>Halaman</td><td>: ' . $data['halaman'] . '</td></tr>';
+        echo '<tr><td>Jumlah Stok</td><td>: ' . $data['stok'] . '</td></tr>';
+        echo '<tr><td>Posisi Rak</td><td>: ' . $data['rak'] . '</td></tr>';
+
+        if ($data['stok'] >= 1 && ($_SESSION['level'] == 'Anggota' || $_SESSION['level'] == 'anggota')) {
+            echo '<tr><td colspan="2"><a href="index.php?page=keranjang&kode_pustaka=' . $data['kode_pustaka'] . '&aksi=pilih_pustaka" class="btn btn-dark btn-block">Masukan Keranjang</a></td></tr>';
+        }
+
+        echo '</tbody>';
+        echo '</table>';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+    }
+}
+
+// Koneksi database
+include '../../config/database.php';
+
+// Mengambil ID pustaka dari POST
+$id_pustaka = $_POST["id_pustaka"];
+
+// Membuat objek PustakaDetails
+$pustaka = new PustakaDetails($kon);
+?>
+
+<div class="card">
+    <?php $pustaka->displayDetails($id_pustaka); ?>
 </div>

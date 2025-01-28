@@ -1,14 +1,12 @@
 <?php
     $pesan="";
 
-        //Fungsi untuk mencegah inputan karakter yang tidak sesuai
         function input($data) {
         $data = trim($data);
         $data = stripslashes($data);
         $data = htmlspecialchars($data);
         return $data;
     }
-    //Cek apakah ada kiriman form dari method post
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     session_start();
@@ -17,16 +15,12 @@
 
     $username = input($_POST["username"]);
     $password = input($_POST["password"]);
-
-     //Query untuk cek pada tabel pengguna yang dijoinkan dengan tabel karyawan
      $tabel_karyawan= "select * from pengguna p
      inner join karyawan k on k.kode_karyawan=p.kode_pengguna
      where username='".$username."' and password='".$password."' limit 1";
 
      $cek_tabel_karyawan = mysqli_query ($kon,$tabel_karyawan);
      $karyawan = mysqli_num_rows($cek_tabel_karyawan);
-
-    //Query untuk cek pada tabel pengguna yang dijoinkan dengan tabel anggota
     $tabel_anggota= "select * from pengguna p
     inner join anggota m on m.kode_anggota=p.kode_pengguna
     where username='".$username."' and password='".$password."' limit 1";

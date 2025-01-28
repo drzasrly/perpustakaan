@@ -34,7 +34,6 @@
                 <div class="row">
                     <div class="col-xl-4 col-lg-5">
                         <div class="card shadow mb-4">
-                        <!-- Card Header - Dropdown -->
                             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                                 <h6 class="m-0 font-weight-bold text-primary">Profil Aplikasi</h6>
                             </div>
@@ -44,7 +43,6 @@
                                 $hasil=mysqli_query($kon,"select * from profil_aplikasi order by nama_aplikasi desc limit 1");
                                 $data = mysqli_fetch_array($hasil); 
                             ?>
-                            <!-- Card Body -->
                             <div class="card-body">
                                 <form action="aplikasi/edit.php" method="post" enctype="multipart/form-data">
                                     <div class="form-group">
@@ -92,7 +90,6 @@
                     </div>
                     <div class="col-xl-4 col-lg-5">
                         <div class="card shadow mb-4">
-                        <!-- Card Header - Dropdown -->
                             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                                 <h6 class="m-0 font-weight-bold text-primary">Aturan Perpustakaan</h6>
                             </div>
@@ -102,7 +99,6 @@
                                 $hasil=mysqli_query($kon,"select * from aturan_perpustakaan limit 1");
                                 $data = mysqli_fetch_array($hasil); 
                             ?>
-                            <!-- Card Body -->
                             <div class="card-body">
                                 <form action="aplikasi/edit.php" method="post" enctype="multipart/form-data">
                                 

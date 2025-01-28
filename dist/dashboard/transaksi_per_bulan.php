@@ -1,6 +1,46 @@
 <?php
 session_start();
 ?>
+
+<?php
+class StaticDashboardData {
+  private $totalPeminjaman;
+  private $jumlahAnggota;
+  private $jumlahPustaka;
+  private $totalDenda;
+
+  public function __construct() {
+      $this->totalPeminjaman = 120;
+      $this->jumlahAnggota = 50;
+      $this->jumlahPustaka = 200;
+      $this->totalDenda = 150000;
+  }
+
+  public function getTotalPeminjaman() {
+      return $this->totalPeminjaman;
+  }
+
+  public function getJumlahAnggota() {
+      return $this->jumlahAnggota;
+  }
+
+  public function getJumlahPustaka() {
+      return $this->jumlahPustaka;
+  }
+
+  public function getTotalDenda() {
+      return $this->totalDenda;
+  }
+}
+
+interface DashboardInterface {
+  public function getTotalPeminjaman();
+  public function getJumlahAnggota();
+  public function getJumlahPustaka();
+}
+?>
+
+
 <canvas id="transaksi_per_bulan" width="100%" height="60"></canvas>
 <?php
     include '../../config/database.php';

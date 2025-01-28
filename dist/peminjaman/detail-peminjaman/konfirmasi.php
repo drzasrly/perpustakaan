@@ -3,96 +3,97 @@ session_start();
 if (isset($_POST['konfirmasi'])) {
 
     include '../../../config/database.php';
-
     mysqli_query($kon, "START TRANSACTION");
 
-    function input($data) {
+    class Pustaka {
+        public $kode_pustaka;
+        public $stok;
+
+        public function __construct($kode_pustaka)
+        {
+            $this->kode_pustaka = $kode_pustaka;
+        }
+
+        public function updateStok($kon, $jumlah)
+        {
+            $query = "UPDATE pustaka SET stok = stok + ($jumlah) WHERE kode_pustaka='$this->kode_pustaka'";
+            return mysqli_query($kon, $query);
+        }
+    }
+
+    class Peminjaman {
+        public $id_detail_peminjaman;
+        public $kode_peminjaman;
+        public $status_peminjaman;
+        public $kode_anggota;
+        public $jenis_denda;
+        public $denda;
+        public $tanggal_pinjam;
+        public $tanggal_kembali;
+        public $pustaka;
+
+        public function __construct($id_detail_peminjaman, $kode_peminjaman, $status_peminjaman, $kode_anggota, $jenis_denda, $denda, $tanggal_pinjam, $tanggal_kembali, Pustaka $pustaka)
+        {
+            $this->id_detail_peminjaman = $id_detail_peminjaman;
+            $this->kode_peminjaman = $kode_peminjaman;
+            $this->status_peminjaman = $status_peminjaman;
+            $this->kode_anggota = $kode_anggota;
+            $this->jenis_denda = $jenis_denda;
+            $this->denda = $denda;
+            $this->tanggal_pinjam = $tanggal_pinjam;
+            $this->tanggal_kembali = $tanggal_kembali;
+            $this->pustaka = $pustaka;
+        }
+
+        public function updatePeminjaman($kon)
+        {
+            $sql = "UPDATE detail_peminjaman SET
+                    status='$this->status_peminjaman',
+                    jenis_denda='$this->jenis_denda',
+                    denda='$this->denda',
+                    tanggal_pinjam='$this->tanggal_pinjam',
+                    tanggal_kembali='$this->tanggal_kembali'
+                    WHERE id_detail_peminjaman='$this->id_detail_peminjaman'";
+            return mysqli_query($kon, $sql);
+        }
+    }
+
+    function input($data)
+    {
         return isset($data) ? htmlspecialchars(trim(stripslashes($data))) : '';
     }
 
-    $id_detail_peminjaman = input($_POST["id_detail_peminjaman"]);
-    $kode_peminjaman = input($_POST["kode_peminjaman"]);
-    $kode_pustaka = input($_POST["kode_pustaka"]);
-    $status_peminjaman = input($_POST["status_peminjaman"]);
-    $kode_anggota = input($_POST["kode_anggota"]);
-    $jenis_denda = input($_POST["jenis_denda"]);
+    $pustaka = new Pustaka(input($_POST["kode_pustaka"]));
+    $peminjaman = new Peminjaman(
+        input($_POST["id_detail_peminjaman"]),
+        input($_POST["kode_peminjaman"]),
+        input($_POST["status_peminjaman"]),
+        input($_POST["kode_anggota"]),
+        input($_POST["jenis_denda"]),
+        isset($_POST["biaya_keterlambatan"]) ? (int) $_POST["biaya_keterlambatan"] : 0,
+        date('Y-m-d'),
+        date('Y-m-d'),
+        $pustaka
+    );
 
-    $tanggal_sekarang = date('Y-m-d'); // Inisialisasi tanggal saat ini
+    $updatePeminjaman = $peminjaman->updatePeminjaman($kon);
+    $updateStok = false;
 
-    if ($jenis_denda == 1) {
-        $denda = isset($_POST["biaya_keterlambatan"]) ? (int) $_POST["biaya_keterlambatan"] : 0;
-    } else {
-        $denda = isset($_POST["biaya_hilang_kerusakan"]) ? (int) $_POST["biaya_hilang_kerusakan"] : 0;
+    if ($peminjaman->status_peminjaman == 1) {
+        $updateStok = $pustaka->updateStok($kon, -1);
+    } elseif ($peminjaman->status_peminjaman == 2) {
+        $updateStok = $pustaka->updateStok($kon, 1);
     }
 
-    if ($status_peminjaman == 0) {
-        $jenis_denda = 0;
-        $tanggal_pinjam = "";
-        $tanggal_kembali = "";
-    } else if ($status_peminjaman == 1) {
-        $jenis_denda = 0;
-        $tanggal_pinjam = date('Y-m-d');
-        if (isset($_POST["tanggal_kembali"]) && $_POST["tanggal_kembali"] !== '') {
-            $tanggal_kembali = strtotime($_POST["tanggal_kembali"]);
-            $tanggal_kembali = date('Y-m-d', $tanggal_kembali);
-        } else {
-            $tanggal_kembali = date('Y-m-d', $tanggal_kembali); 
-        }
-    } else if ($status_peminjaman == 2) {
-        if ($_POST["tanggal_pinjam"] == '0000-00-00') {
-            $tanggal_pinjam = date('Y-m-d');
-        } else {
-            $tanggal_pinjam = date('Y-m-d');
-        }
-
-        if ($_POST["tanggal_kembali"] == '') {
-            $tanggal_kembali = date('Y-m-d', $tanggal_kembali);
-        } else {
-            $tanggal_kembali = strtotime($_POST["tanggal_kembali"]);
-            $tanggal_kembali = date('Y-m-d', $tanggal_kembali);
-        }
-    } else if ($status_peminjaman == 3) {
-        $jenis_denda = 0;
-        $tanggal_pinjam = "";
-        $tanggal_kembali = "";
-    }
-
-    // Pastikan variabel $tanggal_kembali sudah diisi dengan benar
-    if (empty($tanggal_kembali)) {
-        $tanggal_kembali = date('Y-m-d', $tanggal_kembali); // Jika kosong, gunakan NULL
-    } else {
-        $tanggal_kembali = "'" . $tanggal_kembali . "'";
-    }
-
-    $sql = "UPDATE detail_peminjaman SET
-        status='$status_peminjaman',
-        jenis_denda='$jenis_denda',
-        denda='$denda',
-        tanggal_pinjam='$tanggal_pinjam',
-        tanggal_kembali=$tanggal_kembali
-        WHERE id_detail_peminjaman='$id_detail_peminjaman'";
-
-
-    // Mengeksekusi atau menjalankan query di atas
-    $konfirmasi = mysqli_query($kon, $sql);
-
-    if ($status_peminjaman == 1) {
-        // Kurangi stok pustaka saat pustaka dipinjam
-        $update_stok = mysqli_query($kon, "UPDATE pustaka SET stok=stok-1 WHERE kode_pustaka='$kode_pustaka'");
-    } else if ($status_peminjaman == 2) {
-        // Tambah stok pustaka saat pustaka dikembalikan
-        $update_stok = mysqli_query($kon, "UPDATE pustaka SET stok=stok+1 WHERE kode_pustaka='$kode_pustaka'");
-    }
-
-    // Kondisi apakah berhasil atau tidak dalam mengeksekusi query di atas
-    if ($konfirmasi or $update_stok) {
+    if ($updatePeminjaman && $updateStok) {
         mysqli_query($kon, "COMMIT");
-        header("Location:../../index.php?page=detail-peminjaman&kode_peminjaman=$kode_peminjaman&konfirmasi=berhasil#bagian_detail_peminjaman");
+        header("Location:../../index.php?page=detail-peminjaman&kode_peminjaman=$peminjaman->kode_peminjaman&konfirmasi=berhasil#bagian_detail_peminjaman");
     } else {
         mysqli_query($kon, "ROLLBACK");
-        header("Location:../../index.php?page=detail-peminjaman&kode_peminjaman=$kode_peminjaman&konfirmasi=gagal#bagian_detail_peminjaman");
+        header("Location:../../index.php?page=detail-peminjaman&kode_peminjaman=$peminjaman->kode_peminjaman&konfirmasi=gagal#bagian_detail_peminjaman");
     }
 }
+
 ?>
 
 

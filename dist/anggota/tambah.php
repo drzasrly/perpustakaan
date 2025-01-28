@@ -1,11 +1,8 @@
 <?php
 session_start();
     if (isset($_POST['simpan_tambah'])) {
-        
-        //Include file koneksi, untuk koneksikan ke database
         include '../../config/database.php';
         
-        //Fungsi untuk mencegah inputan karakter yang tidak sesuai
         function input($data) {
             $data = trim($data);
             $data = stripslashes($data);
@@ -13,9 +10,7 @@ session_start();
             return $data;
         }
 
-        //Cek apakah ada kiriman form dari method post
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            //Memulai transaksi
             mysqli_query($kon,"START TRANSACTION");
 
             $kode_anggota=input($_POST["kode_anggota"]);
@@ -23,58 +18,75 @@ session_start();
             $email=input($_POST["email"]);
             $no_telp=input($_POST["no_telp"]);
             $alamat=input($_POST["alamat"]);
-            $jenis_kelamin=input($_POST["jenis_kelamin"]);
-            $tempat_lahir=input($_POST["tempat_lahir"]);
-            $tanggal_lahir=input($_POST["tanggal_lahir"]);
             $status=input($_POST["status"]);
 
-            $ekstensi_diperbolehkan	= array('png','jpg','jpeg','gif');
+            // Generate username automatically based on nama_anggota
+            $username = strtolower(str_replace(' ', '_', $nama_anggota));
+
+            // Set default password
+            $password = password_hash("12345678", PASSWORD_DEFAULT);
+
+            $ekstensi_diperbolehkan = array('png','jpg','jpeg','gif');
             $foto = $_FILES['foto']['name'];
             $x = explode('.', $foto);
             $ekstensi = strtolower(end($x));
-            $ukuran	= $_FILES['foto']['size'];
-            $file_tmp = $_FILES['foto']['tmp_name'];	
+            $ukuran = $_FILES['foto']['size'];
+            $file_tmp = $_FILES['foto']['tmp_name'];
 
-            if (!empty($foto)){
-                if(in_array($ekstensi, $ekstensi_diperbolehkan) === true){
-                    //Mengupload gambar
-                    move_uploaded_file($file_tmp, 'foto/'.$foto);
-                    //Sql jika menggunakan foto
-                    $sql="insert into anggota (kode_anggota,nama_anggota,email,no_telp,alamat,jenis_kelamin,tempat_lahir,tanggal_lahir,foto) values
-                        ('$kode_anggota','$nama_anggota','$email','$no_telp','$alamat','$jenis_kelamin','$tempat_lahir','$tanggal_lahir','$foto')";
+            class FileHandler {
+                private $file_tmp;
+                private $file_name;
+
+                public function __construct($file_tmp, $file_name) {
+                    $this->file_tmp = $file_tmp;
+                    $this->file_name = $file_name;
                 }
-            }else {
-                //Sql jika tidak menggunakan foto, maka akan memakai gambar foto_default.png
-                $sql="insert into anggota (kode_anggota,nama_anggota,email,no_telp,alamat,jenis_kelamin,tempat_lahir,tanggal_lahir,foto) values
-                ('$kode_anggota','$nama_anggota','$email','$no_telp','$alamat','$jenis_kelamin','$tempat_lahir','$tanggal_lahir','foto_default.png')";
+
+                public function saveFile($destination) {
+                    return move_uploaded_file($this->file_tmp, $destination . $this->file_name);
+                }
+
+                public function getFileName() {
+                    return $this->file_name;
+                }
             }
 
-            //Mengeksekusi query 
-            $simpan_anggota=mysqli_query($kon,$sql);
-            $level="Anggota";
-            $sql1="insert into pengguna (kode_pengguna,status,level) values
-            ('$kode_anggota','$status','$level')";
+            if (!empty($foto)) {
+                if (in_array($ekstensi, $ekstensi_diperbolehkan) === true) {
+                    $fileHandler = new FileHandler($file_tmp, $foto);
+                    if ($fileHandler->saveFile('foto/')) {
+                        $foto_name = $fileHandler->getFileName();
+                    } else {
+                        $foto_name = 'foto_default.png';
+                    }
+                } else {
+                    $foto_name = 'foto_default.png';
+                }
+            } else {
+                $foto_name = 'foto_default.png';
+            }
 
-            //Menyimpan ke tabel pengguna
-            $simpan_pengguna=mysqli_query($kon,$sql1);
+            $sql = "insert into anggota (kode_anggota, nama_anggota, email, no_telp, alamat, foto) values
+                ('$kode_anggota', '$nama_anggota', '$email', '$no_telp', '$alamat', '$foto_name')";
 
+            $simpan_anggota = mysqli_query($kon, $sql);
+            $level = "Anggota";
+            $sql1 = "insert into pengguna (kode_pengguna, username, password, status, level) values ('$kode_anggota', '$username', '$password', '$status', '$level')";
 
-            //Kondisi apakah berhasil atau tidak dalam mengeksekusi query diatas
+            $simpan_pengguna = mysqli_query($kon, $sql1);
+
             if ($simpan_anggota and $simpan_pengguna) {
-                mysqli_query($kon,"COMMIT");
+                mysqli_query($kon, "COMMIT");
                 header("Location:../../dist/index.php?page=anggota&add=berhasil");
-            }
-            else {
-                mysqli_query($kon,"ROLLBACK");
+            } else {
+                mysqli_query($kon, "ROLLBACK");
                 header("Location:../../dist/index.php?page=anggota&add=gagal");
             }
         }
     }
 ?>
 
-
 <?php
-    // mengambil data barang dengan kode paling besar
     include '../../config/database.php';
     $query = mysqli_query($kon, "SELECT max(id_anggota) as kodeTerbesar FROM anggota");
     $data = mysqli_fetch_array($query);
@@ -92,31 +104,6 @@ session_start();
     <div class="form-group">
         <label>Nama anggota:</label>
         <input name="nama_anggota" type="text" class="form-control" placeholder="Masukan nama" required>
-    </div>
-
-    <div class="row">
-        <div class="col-sm-4">
-            <div class="form-group">
-                <label>Tempat Lahir:</label>
-                <input type="text" name="tempat_lahir" class="form-control" placeholder="Masukan Tempat Lahir" required>
-            </div>
-        </div>
-        <div class="col-sm-3">
-            <div class="form-group">
-                <label>Tanggal Lahir:</label>
-                <input type="date" name="tanggal_lahir" class="form-control" required>
-            </div>
-        </div>
-        <div class="col-sm-5">
-            <div class="form-group">
-                <label>Jenis Kelamin:</label>
-                <select class="form-control" name="jenis_kelamin" required>
-                    <option>Pilih</option>
-                    <option value="1">Laki-laki</option>
-                    <option value="2">Perempuan</option>
-                </select>
-            </div>
-        </div>
     </div>
 
     <div class="row">
@@ -195,13 +182,10 @@ session_start();
 
     var reader = new FileReader();
     reader.onload = function(e) {
-        // get loaded data and render thumbnail.
         document.getElementById("preview").src = e.target.result;
     };
-    // read the image file as a data URL.
     reader.readAsDataURL(this.files[0]);
     });
 
 
 </script>
-
