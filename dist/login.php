@@ -15,33 +15,31 @@
 
     $username = input($_POST["username"]);
     $password = input($_POST["password"]);
-     $tabel_karyawan= "select * from pengguna p
-     inner join karyawan k on k.kode_karyawan=p.kode_pengguna
+     $tabel_penjual= "select * from pengguna p
+     inner join penjual k on k.kodePenjual=p.kodePengguna
      where username='".$username."' and password='".$password."' limit 1";
 
-     $cek_tabel_karyawan = mysqli_query ($kon,$tabel_karyawan);
-     $karyawan = mysqli_num_rows($cek_tabel_karyawan);
-    $tabel_anggota= "select * from pengguna p
-    inner join anggota m on m.kode_anggota=p.kode_pengguna
+     $cek_tabel_penjual = mysqli_query ($kon,$tabel_penjual);
+     $penjual = mysqli_num_rows($cek_tabel_penjual);
+    $tabel_pelanggan= "select * from pengguna p
+    inner join pelanggan m on m.kodePelanggan=p.kodePengguna
     where username='".$username."' and password='".$password."' limit 1";
 
-    $cek_tabel_anggota = mysqli_query ($kon,$tabel_anggota);
-    $anggota = mysqli_num_rows($cek_tabel_anggota);
+    $cek_tabel_pelanggan = mysqli_query ($kon,$tabel_pelanggan);
+    $pelanggan = mysqli_num_rows($cek_tabel_pelanggan);
 
-    if ($karyawan>0){
+    if ($penjual>0){
 
-        $row = mysqli_fetch_assoc($cek_tabel_karyawan);
+        $row = mysqli_fetch_assoc($cek_tabel_penjual);
 
         if ($row["status"]==1){
             
-            //menyimpan data karyawan dalam session
-            $_SESSION["id_pengguna"]=$row["id_pengguna"];
-            $_SESSION["kode_pengguna"]=$row["kode_pengguna"];
-            $_SESSION["nama_karyawan"]=$row["nama_karyawan"];
+            $_SESSION["idPengguna"]=$row["idPengguna"];
+            $_SESSION["kodePengguna"]=$row["kodePengguna"];
+            $_SESSION["namaPenjual"]=$row["namaPenjual"];
             $_SESSION["username"]=$row["username"];
             $_SESSION["level"]=$row["level"];
             $_SESSION["foto"]=$row["foto"];
-            $_SESSION["nip"]=$row["nip"];
 
             header("Location:index.php?page=dashboard");
 
@@ -49,16 +47,15 @@
             $pesan="<div class='alert alert-warning'><strong>Gagal!</strong> Status pengguna tidak aktif.</div>";
         }
 
-    } else if ($anggota>0){
+    } else if ($pelanggan>0){
 
-        $row = mysqli_fetch_assoc($cek_tabel_anggota);
+        $row = mysqli_fetch_assoc($cek_tabel_pelanggan);
 
         if ($row["status"]==1){
             
-            //menyimpan data Anggota dalam session
-            $_SESSION["id_pengguna"]=$row["id_pengguna"];
-            $_SESSION["kode_pengguna"]=$row["kode_pengguna"];
-            $_SESSION["nama_anggota"]=$row["nama_anggota"];
+            $_SESSION["idPengguna"]=$row["idPengguna"];
+            $_SESSION["kodePengguna"]=$row["kodePengguna"];
+            $_SESSION["namaPelanggan"]=$row["namaPelanggan"];
             $_SESSION["username"]=$row["username"];
             $_SESSION["level"]=$row["level"];
             $_SESSION["foto"]=$row["foto"];
@@ -102,7 +99,7 @@
 
                                      <div class="card-body">
                                         <center><img src="aplikasi/logo/<?php echo $data['logo'];?>" id="preview" width="35%"></center>
-                                        <h3 class="text-center font-weight-bold my-4"><?php echo ucwords($data['nama_aplikasi']);?></h3>
+                                    
                                     <?php 	if ($_SERVER["REQUEST_METHOD"] == "POST") echo $pesan; ?>
                                     <?php 
                                             if (isset($_GET['daftar'])) {

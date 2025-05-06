@@ -2,7 +2,7 @@
     $('title').text('Pengaturan Aplikasi');
 </script>
 <?php
-    if ($_SESSION["level"]!='Karyawan' and $_SESSION["level"]!='karyawan'):
+    if ($_SESSION["level"]!='Penjual' and $_SESSION["level"]!='penjual'):
         echo"<div class='alert alert-danger'>Anda tidak punya hak akses</div>";
         exit;
     endif;
@@ -137,7 +137,6 @@
 </style>
 <script>
 
-    //Untuk updload file foto
     $(document).on("click", "#pilih_logo", function() {
         var file = $(this).parents().find(".file");
         file.trigger("click");
@@ -149,14 +148,11 @@
 
         var reader = new FileReader();
         reader.onload = function(e) {
-            // get loaded data and render thumbnail.
             document.getElementById("preview").src = e.target.result;
         };
-        // read the image file as a data URL.
         reader.readAsDataURL(this.files[0]);
     });
 
-    //Fungsi untuk membuat format rupiah
     function format_rupiah(nominal){
         var  reverse = nominal.toString().split('').reverse().join(''),
                 ribuan = reverse.match(/\d{1,3}/g);

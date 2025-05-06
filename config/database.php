@@ -2,7 +2,7 @@
     $host="localhost:3307";
     $user="root";
     $password="";
-    $db="perpustakaan1";
+    $db="zamalda";
     
     $kon = mysqli_connect($host,$user,$password,$db);
     if (!$kon){

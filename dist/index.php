@@ -1,14 +1,14 @@
 <?php 
   session_start();
-  if (!$_SESSION["id_pengguna"]){
+  if (!$_SESSION["idPengguna"]){
         header("Location:login.php");
   }else {
 
     include '../config/database.php';
-    $id_pengguna=$_SESSION["id_pengguna"];
+    $idPengguna=$_SESSION["idPengguna"];
     $username=$_SESSION["username"];
 
-    $hasil=mysqli_query($kon,"select username from pengguna where id_pengguna=$id_pengguna");
+    $hasil=mysqli_query($kon,"select username from pengguna where idPengguna=$idPengguna");
     $data = mysqli_fetch_array($hasil); 
     $username_db=$data['username'];
 
@@ -51,11 +51,9 @@
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
             <a class="navbar-brand" href="#"><?php  echo $data['nama_aplikasi'];?></a>
             <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>
-            <!-- Navbar Search-->
             <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
              
             </form>
-            <!-- Navbar-->
             <ul class="navbar-nav ml-auto ml-md-0">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="userDropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
@@ -71,7 +69,7 @@
                 <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
                     <div class="sb-sidenav-menu">
                     <?php 
-                        if ($_SESSION['level']=='Karyawan' or $_SESSION['level']=='karyawan'):
+                        if ($_SESSION['level']=='Penjual' or $_SESSION['level']=='penjual'):
                     ?>
                         <div class="nav">
                             <div class="sb-sidenav-menu-heading">Menu</div>
@@ -79,13 +77,9 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-home"></i></div>
                                 Dashboard
                             </a>
-                            <a class="nav-link" href="index.php?page=daftar-peminjaman">
+                            <a class="nav-link" href="index.php?page=daftar-transaksi">
                                 <div class="sb-nav-link-icon"><i class="fas fa-list-ol"></i></div>
-                                Peminjaman
-                            </a>
-                            <a class="nav-link" href="index.php?page=daftar-pengembalian">
-                                <div class="sb-nav-link-icon"><i class="fas fa-list-ol"></i></div>
-                                Pengembalian
+                                Transaksi
                             </a>
                             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLaporan" aria-expanded="false" aria-controls="collapseLayouts">
                                 <div class="sb-nav-link-icon"><i class="fas fa-book"></i></div>
@@ -94,23 +88,21 @@
                             </a>
                             <div class="collapse" id="collapseLaporan" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="index.php?page=laporan-peminjaman"><i class="fas fa-book"></i>  &nbsp; Peminjaman</a>
-                                    <a class="nav-link" href="index.php?page=laporan-pustaka"><i class="fas fa-grip-horizontal"></i> &nbsp; Pustaka</a>
-                                    <a class="nav-link" href="index.php?page=laporan-anggota"><i class="fas fa-user-tag"></i> &nbsp; Anggota</a>
+                                    <a class="nav-link" href="index.php?page=laporan-transaksi"><i class="fas fa-book"></i>  &nbsp; Transaksi</a>
+                                    <a class="nav-link" href="index.php?page=laporan-barang"><i class="fas fa-grip-horizontal"></i> &nbsp; Barang</a>
+                                    <a class="nav-link" href="index.php?page=laporan-pelanggan"><i class="fas fa-user-tag"></i> &nbsp; Pelanggan</a>
                                 </nav>
                             </div>
 
                             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePustaka" aria-expanded="false" aria-controls="collapseLayouts">
                                 <div class="sb-nav-link-icon"><i class="fas fa-book"></i></div>
-                                Pustaka
+                                Barang
                                 <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                             </a>
                             <div class="collapse" id="collapsePustaka" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="index.php?page=pustaka"><i class="fas fa-book"></i>  &nbsp; Pustaka</a>
+                                    <a class="nav-link" href="index.php?page=barang"><i class="fas fa-book"></i>  &nbsp; Barang</a>
                                     <a class="nav-link" href="index.php?page=kategori"><i class="fas fa-grip-horizontal"></i> &nbsp; Kategori</a>
-                                    <a class="nav-link" href="index.php?page=penulis"><i class="fas fa-user-tag"></i> &nbsp; Penulis</a>
-                                    <a class="nav-link" href="index.php?page=penerbit"><i class="fas fa-building"></i> &nbsp; Penerbit</a>
                                 </nav>
                             </div>
                             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePengguna" aria-expanded="false" aria-controls="collapseLayouts">
@@ -120,8 +112,8 @@
                             </a>
                             <div class="collapse" id="collapsePengguna" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="index.php?page=anggota"><i class="fas fa-user"></i>  &nbsp; Anggota</a>
-                                    <a class="nav-link" href="index.php?page=karyawan"><i class="fas fa-user-tie"></i> &nbsp; Karyawan</a>
+                                    <a class="nav-link" href="index.php?page=pelanggan"><i class="fas fa-user"></i>  &nbsp; Pelanggan</a>
+                                    <a class="nav-link" href="index.php?page=penjual"><i class="fas fa-user-tie"></i> &nbsp; Penjual</a>
                                 </nav>
                             </div>
                             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePengaturan" aria-expanded="false" aria-controls="collapseLayouts">
@@ -137,7 +129,7 @@
                         </div>
                         <?php endif; ?>
                         <?php 
-                        if ($_SESSION['level']=='Anggota' or $_SESSION['level']=='anggota'):
+                        if ($_SESSION['level']=='Pelanggan' or $_SESSION['level']=='pelanggan'):
                         ?>
                         <div class="nav">
                             <div class="sb-sidenav-menu-heading">Menu</div>
@@ -145,29 +137,17 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-home"></i></div>
                                 Dashboard
                             </a>
-                            <a class="nav-link" href="index.php?page=pustaka">
+                            <a class="nav-link" href="index.php?page=barang">
                                 <div class="sb-nav-link-icon"><i class="fas fa-book"></i></div>
-                                Pustaka
+                                Barang
                             </a>
                             <a class="nav-link" href="index.php?page=keranjang">
                                 <div class="sb-nav-link-icon"><i class="fas fa-cart-arrow-down"></i></div>
                                 Keranjang
                             </a>
-                            <a class="nav-link" href="index.php?page=peminjaman-saya">
+                            <a class="nav-link" href="index.php?page=transaksi-saya">
                                 <div class="sb-nav-link-icon"><i class="fas fa-list-alt"></i></div>
-                                Peminjaman
-                            </a>
-                            <a class="nav-link" href="index.php?page=pengembalian-saya">
-                                <div class="sb-nav-link-icon"><i class="fas fa-list-alt"></i></div>
-                                Pengembalian
-                            </a>
-                            <a class="nav-link" href="index.php?page=keterlambatan-saya">
-                                <div class="sb-nav-link-icon"><i class="fas fa-calendar-alt"></i></div>
-                                Keterlambatan
-                            </a>
-                            <a class="nav-link" href="index.php?page=denda-saya">
-                                <div class="sb-nav-link-icon"><i class="fas fa-dollar-sign"></i></div>
-                                Denda
+                                Transaksi
                             </a>
                         </div>
                         <?php endif; ?>
@@ -175,11 +155,11 @@
                     <div class="sb-sidenav-footer">
                         <div class="small">Login Sebagai:</div>
                         <?php 
-                            if ($_SESSION['level']=='Karyawan' or $_SESSION['level']=='karyawan'):
-                                echo $_SESSION["nama_karyawan"];
+                            if ($_SESSION['level']=='Penjual' or $_SESSION['level']=='penjual'):
+                                echo $_SESSION["namaPenjual"];
                             endif; 
-                            if ($_SESSION['level']=='Anggota' or $_SESSION['level']=='anggota'):
-                                echo $_SESSION["nama_anggota"];
+                            if ($_SESSION['level']=='Pelanggan' or $_SESSION['level']=='pelaanggan'):
+                                echo $_SESSION["namaPelanggan"];
                             endif; 
                         ?>
                        
@@ -195,44 +175,35 @@
                             case 'dashboard':
                                 include "dashboard/index.php";
                                 break;
-                            case 'anggota':
-                                include "anggota/index.php";
+                            case 'pelanggan':
+                                include "pelanggan/index.php";
                                 break;
-                            case 'karyawan':
-                                include "karyawan/index.php";
+                            case 'penjual':
+                                include "penjual/index.php";
                                 break;
-                            case 'pustaka':
-                                include "pustaka/index.php";
-                                break;
-                            case 'penulis':
-                                include "pustaka/penulis/index.php";
-                                break;
-                            case 'penerbit':
-                                include "pustaka/penerbit/index.php";
+                            case 'barang':
+                                include "barang/index.php";
                                 break;
                             case 'kategori':
-                                include "pustaka/kategori/index.php";
+                                include "barang/kategori/index.php";
                                 break;
-                            case 'input-peminjaman':
-                                include "peminjaman/input-peminjaman.php";
+                            case 'input-transaksi':
+                                include "transaksi/input-transaksi.php";
                                 break;
-                            case 'daftar-peminjaman':
-                                include "peminjaman/index.php";
+                            case 'daftar-transaksi':
+                                include "transaksi/index.php";
                                 break;
-                            case 'detail-peminjaman':
-                                include "peminjaman/detail-peminjaman.php";
+                            case 'detail-transaksi':
+                                include "transaksi/detail-transaksi.php";
                                 break;
-                            case 'laporan-peminjaman':
-                                include "laporan/peminjaman/laporan-peminjaman.php";
+                            case 'laporan-transaksi':
+                                include "laporan/transaksi/laporan-transaksi.php";
                                 break;
-                            case 'laporan-pustaka':
-                                include "laporan/pustaka/laporan-pustaka.php";
+                            case 'laporan-barang':
+                                include "laporan/barang/laporan-barang.php";
                                 break;
-                            case 'laporan-anggota':
-                                include "laporan/anggota/laporan-anggota.php";
-                                break;
-                            case 'laporan-pendapatan':
-                                include "laporan/pendapatan/laporan-pendapatan.php";
+                            case 'laporan-pelanggan':
+                                include "laporan/pelanggan/laporan-pelanggan.php";
                                 break;
                             case 'keranjang':
                                 include "keranjang/index.php";
@@ -240,20 +211,8 @@
                             case 'booking':
                                 include "keranjang/booking.php";
                                 break;
-                            case 'peminjaman-saya':
-                                include "peminjaman/anggota/index.php";
-                                break;
-                            case 'pengembalian-saya':
-                                include "pengembalian/index.php";
-                                break;
-                            case 'daftar-pengembalian':
-                                include "pengembalian/index.php";
-                                break;
-                            case 'keterlambatan-saya':
-                                include "peminjaman/anggota/keterlambatan.php";
-                                break;
-                            case 'denda-saya':
-                                include "peminjaman/anggota/denda.php";
+                            case 'transaksi-saya':
+                                include "transaksi/pelanggan/index.php";
                                 break;
                             case 'profil':
                                 include "profil/index.php";

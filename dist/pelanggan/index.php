@@ -87,13 +87,11 @@
                       </thead>
                       <tbody>
                           <?php
-                              // include database
                               include '../config/database.php';
-                              // perintah sql untuk menampilkan daftar anggota
                               $sql="select * from anggota order by id_anggota desc";
                               $hasil=mysqli_query($kon,$sql);
                               $no=0;
-                              //Menampilkan data dengan perulangan while
+                            
                               while ($data = mysqli_fetch_array($hasil)):
                               $no++;
                           ?>
@@ -110,7 +108,6 @@
                                     <a href="anggota/hapus.php?id_anggota=<?php echo $data['id_anggota']; ?>&kode_anggota=<?php echo $data['kode_anggota']; ?>" class="btn-hapus btn btn-danger btn-circle" ><i class="fa fa-trash"></i></a>
                               </td>
                           </tr>
-                          <!-- bagian akhir (penutup) while -->
                           <?php endwhile; ?>
                       </tbody>
                     </table>
